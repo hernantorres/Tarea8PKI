@@ -45,8 +45,9 @@ namespace Tarea8PKI
             parentsCerts = loadParentsCerts(rutaCertRaiz, rutaCertEmisora);
             parentsCrls = loadParentsCrls(rutaCrlRaiz, rutaCrlEmisora);
 
+            //keysTest();
             // Solo contamos con un usuario
-            Console.WriteLine("Cargando usuarios...\n");
+            Console.WriteLine("Cargando usuarios... (1)\n");
             usersCerts = new  List<X509Certificate>();
             usersCerts.Add(LoadCertificate(@"C:\Users\User\Desktop\5to año compu\llave pública\mi certificado\certificado.cer"));
             
@@ -59,8 +60,8 @@ namespace Tarea8PKI
                 Console.WriteLine("1.	Hacer un proceso de autenticación simple mediante certificado digital.");
                 Console.WriteLine("2.	Generar una firma digital (PKCS#7/CMS).");
                 Console.WriteLine("3.	Solicitar una estampa de tiempo a la TSA SINPE.");
-                Console.WriteLine("4.	Test de llaves.");
-                Console.WriteLine("5.	Salir.\n");
+                //Console.WriteLine("4.	Test de llaves.");
+                Console.WriteLine("4.	Salir.\n");
                 
                 char inputChar = Console.ReadKey().KeyChar;
                 Console.WriteLine();
@@ -75,10 +76,10 @@ namespace Tarea8PKI
                 else if(inputChar == '3') {
                     sinpeTimeStamp();
                 }
+                //else if(inputChar == '4') {
+                //    keysTest();
+                //}
                 else if(inputChar == '4') {
-                    keysTest();
-                }
-                else if(inputChar == '5') {
                     correct = false;
                 }
                 else {
@@ -312,7 +313,6 @@ namespace Tarea8PKI
                 if (cert.IssuerDN.Equivalent(cert.SubjectDN))
                 {
                     rootCerts.Add(new TrustAnchor(cert, null));
-                    //intermediateCerts.Add(cert);
                 }
                 else
                     intermediateCerts.Add(cert);
@@ -371,7 +371,7 @@ namespace Tarea8PKI
                                 certificado, // certificado de mi persona
                                 BuildCertificateChain(certificado, parentsCerts) ); // certificado de CA raiz y emisora
             File.WriteAllBytes(path, signedData);
-            Console.WriteLine("La firma se ha escrito en: C:\\Users\\User\\Desktop\\firmado.data");
+            Console.WriteLine("La firma se ha escrito en: C:\\Users\\User\\Desktop\\5to año compu\\llave pública\\firmas y estampas\\firmado.data");
         }
 
         /*
@@ -387,14 +387,14 @@ namespace Tarea8PKI
             signCert,
             "2.16.840.1.101.3.4.2.1"); // SHA256 digest ID
             var storeCerts = new List<X509Certificate>();
-            storeCerts.Add(signCert); // NOTE: Adding end certificate too
+            storeCerts.Add(signCert); // Agregar tambien el certificado
             storeCerts.AddRange(certChain); // Se asume que no contiene el certificado final
             // Construir un "store" para agregarlo al firmante
             var storeParams = new X509CollectionStoreParameters(storeCerts);
             var certStore = X509StoreFactory.Create("CERTIFICATE/COLLECTION", storeParams);
             generator.AddCertificates(certStore);
 
-            // Generar ;a firma
+            // Generar la firma
             var signedData = generator.Generate(
             new CmsProcessableByteArray(data),
             true); // encapsulate = false for detached signature
@@ -426,16 +426,16 @@ namespace Tarea8PKI
                 cadenaNacional.Add(LoadCertificate(rutaCertRaizNacional)); //Raiz Nacional
                 cadenaNacional.Add(LoadCertificate(rutaCertTsaNacional)); 
 
-                cadenaNacional[1].Verify(cadenaNacional[0].GetPublicKey());
+                //cadenaNacional[0].Verify(cadenaNacional[0].GetPublicKey());
 
                 // No se esta verificando la cadena por la siguiente excepcion al verificar la firma de la CA TSA:
                 // Org.BouncyCastle.Pkix.PkixCertPathValidatorException : Certificate has unsupported critical extension
                 // Parece ser que las soluciones requieren omitir una extension critica, por lo que prefiero
                 // no construir la cadena del todo.
-                // cadenaNacional[1].Verify(cadenaNacional[0].GetPublicKey());
+                //cadenaNacional[1].Verify(cadenaNacional[0].GetPublicKey());
                 //
                 //Console.WriteLine("Construyendo cadena de certificados...");
-                //BuildCertificateChain(tsaSimpe, cadenaNacional);
+                BuildCertificateChain(tsaSimpe, cadenaNacional);
 
                 // Verificamos su estado en el CRL de la CA EMISORA
                 Console.WriteLine("Verificando estado del certificado...");
@@ -510,8 +510,8 @@ namespace Tarea8PKI
             Console.WriteLine();
             Console.WriteLine("Cargando certificado desde: C:\\Users\\User\\Desktop\\5to año compu\\llave pública\\mi certificado\\certificado.cer");
             Console.WriteLine("Cargando llave desde: C:\\Users\\User\\Desktop\\5to año compu\\llave pública\\mi certificado\\key.pem");
-            string rutaCertificado = @"C:\Users\User\Desktop\5to año compu\llave pública\mi certificado\certificado.cer";
-            string rutaLlavePrivada = @"C:\Users\User\Desktop\5to año compu\llave pública\mi certificado\key.pem";
+            string rutaCertificado = @"C:\Users\User\Desktop\certificado.cer";
+            string rutaLlavePrivada = @"C:\Users\User\Desktop\key.pem";
             
             X509Certificate certificado = LoadCertificate(rutaCertificado);
             
